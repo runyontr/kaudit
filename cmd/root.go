@@ -74,6 +74,7 @@ kaudit --spec allspec.json --version v1,betav2
 
 
 		//Load the schema to validate against
+		//TODO (@trunyon) load spec from command line flag
 		schemaLoader := gojsonschema.NewReferenceLoader(os.ExpandEnv("file://$PWD/spec.json"))
 		schema, err := gojsonschema.NewSchema(schemaLoader)
 		if err != nil{
@@ -81,6 +82,7 @@ kaudit --spec allspec.json --version v1,betav2
 		}
 
 		//Hard coded deployment search as first look at validating objects
+		//TODO (@trunyon) load namespace from command line flag
 		deps, err := clientset.AppsV1beta2().Deployments("default").List(v1.ListOptions{})
 		if err != nil{
 			fmt.Printf("Error getting deployments: %v\n", err)
@@ -108,15 +110,6 @@ kaudit --spec allspec.json --version v1,betav2
 			}
 
 		}
-		//for _, r := range resources{
-		//	//TODO(@trunyon) make this command line flag
-		//
-		//
-		//
-		//
-		//
-		//}
-
 	},
 }
 
