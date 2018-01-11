@@ -6,7 +6,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func GetResourceTypes(clientset *kubernetes.Clientset) (resources []v1.APIResource, err error){
+func GetResourceTypes(clientset *kubernetes.Clientset, groupVersion string) (resources []v1.APIResource, err error){
 
 	//this group should be different for different cluster version:
 	//1.8  apps/v1beta2
@@ -14,7 +14,7 @@ func GetResourceTypes(clientset *kubernetes.Clientset) (resources []v1.APIResour
 
 	// We also want the resource to be in the category "all"
 	var resourceList *v1.APIResourceList
-	resourceList, err = clientset.Discovery().ServerResourcesForGroupVersion("apps/v1beta2")
+	resourceList, err = clientset.Discovery().ServerResourcesForGroupVersion(groupVersion)
 
 	if err != nil{
 		return

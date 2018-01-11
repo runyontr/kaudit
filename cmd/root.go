@@ -1,4 +1,4 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
+// Copyright © 2018 NAME HERE runyontr@gmail.com
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -58,15 +58,16 @@ kaudit pods --spec podsspec.json
 
 
 #Limit to just v1 and betav2 apis
-kaudit --spec allspec.json --version v1,betav2
+kaudit --spec allspec.json --version v1,v1beta2
 
 
 `,
 // Uncomment the following line if your bare application
 // has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
+		errorCount := 0
 		//we'll use this in the future to find all resource types
-		_, err := discovery.GetResourceTypes(clientset)
+		_, err := discovery.GetResourceTypes(clientset, viper.GetString("version"))
 		if err != nil{
 			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)
@@ -74,16 +75,20 @@ kaudit --spec allspec.json --version v1,betav2
 
 
 		//Load the schema to validate against
-		//TODO (@trunyon) load spec from command line flag
-		schemaLoader := gojsonschema.NewReferenceLoader(os.ExpandEnv("file://$PWD/spec.json"))
+		spec, err := filepath.Abs(viper.GetString("spec"))
+		if err != nil{
+			fmt.Println("Provide valid path for spec")
+			fmt.Printf("Provided: %v\nError: %v", viper.GetString("spec"), err)
+			os.Exit(1)
+		}
+		schemaLoader := gojsonschema.NewReferenceLoader(fmt.Sprintf("file://%v",spec ))
 		schema, err := gojsonschema.NewSchema(schemaLoader)
 		if err != nil{
 			panic(err)
 		}
 
 		//Hard coded deployment search as first look at validating objects
-		//TODO (@trunyon) load namespace from command line flag
-		deps, err := clientset.AppsV1beta2().Deployments("default").List(v1.ListOptions{})
+		deps, err := clientset.AppsV1beta2().Deployments(viper.GetString("namespace")).List(v1.ListOptions{})
 		if err != nil{
 			fmt.Printf("Error getting deployments: %v\n", err)
 			os.Exit(1)
@@ -91,7 +96,7 @@ kaudit --spec allspec.json --version v1,betav2
 
 		for _, d := range deps.Items{
 			b, _ := json.Marshal(d)
-			//check each against spec.json
+			//check each against app-def.json
 			documentLoader :=  gojsonschema.NewStringLoader(string(b))
 
 			result, err := schema.Validate(documentLoader)
@@ -100,15 +105,19 @@ kaudit --spec allspec.json --version v1,betav2
 			}
 
 			if result.Valid() {
-				fmt.Printf("The document is valid\n")
+				fmt.Printf("Deployment %v is valid\n", d.Name)
 			} else {
 				fmt.Printf("Deployment: %v", d.Name)
 				fmt.Printf("The document is not valid. see errors :\n")
 				for _, desc := range result.Errors() {
 					fmt.Printf("- %s\n", desc)
+					errorCount++
 				}
 			}
 
+		}
+		if errorCount>0{
+			os.Exit(errorCount)
 		}
 	},
 }
@@ -134,12 +143,20 @@ func init() {
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	RootCmd.Flags().StringP("namespace", "n", "default", "Limit search to provided namespace")
-	RootCmd.Flags().StringP("spec", "s","spec.json","JSON Spec to use")
+	RootCmd.Flags().StringP("spec", "s","app-def.json","JSON Spec to use")
+	RootCmd.Flags().StringP("version", "v","apps/v1beta2","Resource group to query")
+
 	if home := homeDir(); home != "" {
 		kubeconfig = RootCmd.Flags().String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 	} else {
 		kubeconfig = RootCmd.Flags().String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
+
+
+	viper.BindPFlag("namespace", RootCmd.Flags().Lookup("namespace"))
+	viper.BindPFlag("spec", RootCmd.Flags().Lookup("spec"))
+	viper.BindPFlag("version", RootCmd.Flags().Lookup("version"))
+	viper.BindPFlag("kuebconfig", RootCmd.Flags().Lookup("kubeconfig"))
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -156,6 +173,9 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
+
+
+
 
 
 	// use the current context in kubeconfig
