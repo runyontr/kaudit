@@ -59,27 +59,33 @@ running the `kaudit` command should demonstrate which labels and annotations are
 applications:
 
 ```bash
-$ kaudit --spec app-def.json 
-Deployment: bar-deploymentThe document is not valid. see errors :
-- app.kubernetes.io/name: app.kubernetes.io/name is required
-- app.kubernetes.io/version: app.kubernetes.io/version is required
-- app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
-- app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
-- app.kubernetes.io/component: app.kubernetes.io/component is required
-- app.kubernetes.io/manager: app.kubernetes.io/manager is required
-- app.kubernetes.io/usage: app.kubernetes.io/usage is required
-- app.kubernetes.io/url: app.kubernetes.io/url is required
-Deployment foo-deployment is valid
+$ kaudit --spec app-def.json
+
+
+deployments: 
+bar-deployment:	Errors:
+	 - app.kubernetes.io/name: app.kubernetes.io/name is required
+	 - app.kubernetes.io/version: app.kubernetes.io/version is required
+	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
+	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
+	 - app.kubernetes.io/component: app.kubernetes.io/component is required
+	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
+	 - app.kubernetes.io/usage: app.kubernetes.io/usage is required
+	 - app.kubernetes.io/url: app.kubernetes.io/url is required
+foo-deployment:	Ok!
+
+
+replicasets: 
+bar-deployment-589f55cb9d:	Errors:
+	 - app.kubernetes.io/name: app.kubernetes.io/name is required
+	 - app.kubernetes.io/version: app.kubernetes.io/version is required
+	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
+	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
+	 - app.kubernetes.io/component: app.kubernetes.io/component is required
+	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
+	 - app.kubernetes.io/usage: app.kubernetes.io/usage is required
+	 - app.kubernetes.io/url: app.kubernetes.io/url is required
+foo-deployment-57fc95945b:	Ok!
+
 ```
 
-
-
-# Future Work
-
-Include all objects in Workloads API:  Currently
-only Deployments are searched
-
-Dynamic resource definitions:
-* Query against [ServerResourcesForGroupVersion](https://github.com/kubernetes/client-go/blob/master/discovery/discovery_client.go#L75)
-to obtain all resource types inside of `apps/v1` ( or other group).  Use the APIResource object
-to query for all instances of this resource and validate each instance
