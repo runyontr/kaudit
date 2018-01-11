@@ -67,7 +67,7 @@ kaudit --spec allspec.json --version v1,v1beta2
 	Run: func(cmd *cobra.Command, args []string) {
 		errorCount := 0
 		//we'll use this in the future to find all resource types
-		_, err := discovery.GetResourceTypes(clientset, viper.GetString("version"))
+		resources, err := discovery.GetResourceTypes(clientset, viper.GetString("version"))
 		if err != nil{
 			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)
@@ -87,38 +87,72 @@ kaudit --spec allspec.json --version v1,v1beta2
 			panic(err)
 		}
 
-		//Hard coded deployment search as first look at validating objects
-		deps, err := clientset.AppsV1beta2().Deployments(viper.GetString("namespace")).List(v1.ListOptions{})
-		if err != nil{
-			fmt.Printf("Error getting deployments: %v\n", err)
-			os.Exit(1)
+
+		//The objects returned are lists.  This captures the ability to unmarshal
+		// the return json into a list of objects that contain a Metadata object
+		//
+		// This provides an inherent restriction on the validation of the spec.
+		// The serialized version of an Item is used in the schema validation, but
+		// this object ignores the non-ObjectMetadata information.  If non-ObjectMetadata
+		// content needs to be validated, the process below needs to be changed.
+		type objectList struct {
+			Items []struct {
+				Metadata v1.ObjectMeta `json:"metadata"`
+			} `json:"items"`
+
 		}
 
-		for _, d := range deps.Items{
-			b, _ := json.Marshal(d)
-			//check each against app-def.json
-			documentLoader :=  gojsonschema.NewStringLoader(string(b))
+		for _, resource := range resources{
 
-			result, err := schema.Validate(documentLoader)
-			if err != nil {
-				panic(err.Error())
+			//Build the query to get back instances of the resource type
+			b, e  := clientset.RESTClient().Get().
+				Namespace(viper.GetString("namespace")).
+					AbsPath("apis/"+viper.GetString("version")).
+					Resource(resource.Name).Do().Raw()
+
+			if e != nil{
+				fmt.Printf("Error Doing request: %v\n", e)
+				continue
 			}
 
-			if result.Valid() {
-				fmt.Printf("Deployment %v is valid\n", d.Name)
-			} else {
-				fmt.Printf("Deployment: %v", d.Name)
-				fmt.Printf("The document is not valid. see errors :\n")
-				for _, desc := range result.Errors() {
-					fmt.Printf("- %s\n", desc)
-					errorCount++
+			list := objectList{}
+
+			e = json.Unmarshal(b,&list)
+			if e != nil{
+				fmt.Printf("Error unmarshiling to extract Metadata: %v\n",e)
+				continue
+			}
+
+			if len(list.Items) > 0{
+				fmt.Printf("\n\n%v: \n",resource.Name)
+			}
+
+			for _, item := range list.Items{
+				b2,_ := json.MarshalIndent(item, "", "\t")
+
+				//check each against app-def.json
+				documentLoader :=  gojsonschema.NewStringLoader(string(b2))
+
+				jsonResult, err := schema.Validate(documentLoader)
+				if err != nil {
+					panic(err.Error())
+				}
+
+				fmt.Printf("%v:\t", item.Metadata.Name)
+
+				if jsonResult.Valid() {
+					fmt.Printf("Ok!\n")
+				} else {
+					fmt.Printf("Errors:\n")
+					for _, desc := range jsonResult.Errors() {
+						fmt.Printf("\t - %s\n", desc)
+						errorCount++
+					}
 				}
 			}
+		}
 
-		}
-		if errorCount>0{
-			os.Exit(errorCount)
-		}
+		os.Exit(errorCount)
 	},
 }
 

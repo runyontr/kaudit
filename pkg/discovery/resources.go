@@ -21,8 +21,10 @@ func GetResourceTypes(clientset *kubernetes.Clientset, groupVersion string) (res
 	}
 
 	for _, r := range resourceList.APIResources{
+
 		if contains(r.Categories, "all"){
 			resources = append(resources, r)
+		} else{
 		}
 	}
 

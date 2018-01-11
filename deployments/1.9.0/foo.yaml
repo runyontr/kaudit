@@ -22,6 +22,7 @@ spec:
       labels:
         app.kubernetes.io/name: foo
         app.kubernetes.io/version: 0.0.1
+        app.kubernetes.io/component: front-end
         app.kubernetes.io/component-name: nginx
         app.kubernetes.io/component-version: 1.7.9
         app.kubernetes.io/manager: yaml
