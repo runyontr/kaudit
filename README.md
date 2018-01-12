@@ -28,7 +28,7 @@ adhere to the schema.
 
 ## Installation
 ```bash
-$ go install github.com/runyontr/kaudit
+$ go get github.com/runyontr/kaudit
 ```
 
 ## Deploy Samples
