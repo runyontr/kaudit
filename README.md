@@ -89,3 +89,45 @@ foo-deployment-57fc95945b:	Ok!
 
 ```
 
+To compare against `v1` resources (e.g. services, pods) use the following:
+
+```bash
+$ kaudit -v v1
+
+
+pods: 
+bar-deployment-589f55cb9d-2zbdz:	Errors:
+	 - app.kubernetes.io/name: app.kubernetes.io/name is required
+	 - app.kubernetes.io/version: app.kubernetes.io/version is required
+	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
+	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
+	 - app.kubernetes.io/component: app.kubernetes.io/component is required
+	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
+bar-deployment-589f55cb9d-6msgt:	Errors:
+	 - app.kubernetes.io/name: app.kubernetes.io/name is required
+	 - app.kubernetes.io/version: app.kubernetes.io/version is required
+	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
+	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
+	 - app.kubernetes.io/component: app.kubernetes.io/component is required
+	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
+bar-deployment-589f55cb9d-8jw56:	Errors:
+	 - app.kubernetes.io/name: app.kubernetes.io/name is required
+	 - app.kubernetes.io/version: app.kubernetes.io/version is required
+	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
+	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
+	 - app.kubernetes.io/component: app.kubernetes.io/component is required
+	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
+foo-deployment-57fc95945b-hf2p6:	Ok!
+
+
+services: 
+kubernetes:	Errors:
+	 - app.kubernetes.io/name: app.kubernetes.io/name is required
+	 - app.kubernetes.io/version: app.kubernetes.io/version is required
+	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
+	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
+	 - app.kubernetes.io/component: app.kubernetes.io/component is required
+	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
+exit status 24
+
+```
