@@ -92,7 +92,7 @@ foo-deployment-57fc95945b:	Ok!
 To compare against `v1` resources (e.g. services, pods) use the following:
 
 ```bash
-$ kaudit -v v1
+$ kaudit --spec app-def.json --version v1
 
 
 pods: 
