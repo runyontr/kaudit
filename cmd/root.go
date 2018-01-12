@@ -29,6 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"encoding/json"
 	"github.com/xeipuuv/gojsonschema"
+	"net/url"
 )
 
 var cfgFile string
@@ -103,11 +104,17 @@ kaudit --spec allspec.json --version v1,v1beta2
 		}
 
 		for _, resource := range resources{
+			url := url.URL{}
 
+			if len(clientset.LegacyPrefix) > 0 && viper.GetString("version") == "v1" {
+				url.Path = clientset.LegacyPrefix + "/" + viper.GetString("version")
+			} else {
+				url.Path = "/apis/" + viper.GetString("version")
+			}
 			//Build the query to get back instances of the resource type
 			b, e  := clientset.RESTClient().Get().
 				Namespace(viper.GetString("namespace")).
-					AbsPath("apis/"+viper.GetString("version")).
+					AbsPath(url.String()).
 					Resource(resource.Name).Do().Raw()
 
 			if e != nil{
