@@ -30,6 +30,7 @@ import (
 	"encoding/json"
 	"github.com/xeipuuv/gojsonschema"
 	"net/url"
+	"strings"
 )
 
 var cfgFile string
@@ -67,13 +68,6 @@ kaudit --spec allspec.json --version v1,v1beta2
 // has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 		errorCount := 0
-		//we'll use this in the future to find all resource types
-		resources, err := discovery.GetResourceTypes(clientset, viper.GetString("version"))
-		if err != nil{
-			fmt.Printf("Error: %v\n", err)
-			os.Exit(1)
-		}
-
 
 		//Load the schema to validate against
 		spec, err := filepath.Abs(viper.GetString("spec"))
@@ -88,6 +82,28 @@ kaudit --spec allspec.json --version v1,v1beta2
 			panic(err)
 		}
 
+		resources  := make([]v1.APIResource,0)
+
+		if len(args) == 0{
+			//we'll use this in the future to find all resource types
+			apiResources, err := discovery.GetResourceTypes(clientset, viper.GetString("version"))
+			if err != nil{
+				fmt.Printf("Error: %v\n", err)
+				os.Exit(1)
+			}
+			resources = append(resources, apiResources...)
+		} else{
+			//get
+			inputResources := strings.Split(args[0],",")
+			for _, r := range inputResources{
+				apiResources, err := discovery.GetResource(clientset, r)
+				if err != nil{
+					fmt.Printf("Error getting resource %v: %v",r, err)
+					os.Exit(1)
+				}
+				resources = append(resources, apiResources)
+			}
+		}
 
 		//The objects returned are lists.  This captures the ability to unmarshal
 		// the return json into a list of objects that contain a Metadata object
@@ -106,10 +122,10 @@ kaudit --spec allspec.json --version v1,v1beta2
 		for _, resource := range resources{
 			url := url.URL{}
 
-			if len(clientset.LegacyPrefix) > 0 && viper.GetString("version") == "v1" {
-				url.Path = clientset.LegacyPrefix + "/" + viper.GetString("version")
+			if len(clientset.LegacyPrefix) > 0 && resource.Version == "v1" {
+				url.Path = clientset.LegacyPrefix + "/" + resource.Version
 			} else {
-				url.Path = "/apis/" + viper.GetString("version")
+				url.Path = "/apis/" + resource.Version
 			}
 			//Build the query to get back instances of the resource type
 			b, e  := clientset.RESTClient().Get().
@@ -131,10 +147,18 @@ kaudit --spec allspec.json --version v1,v1beta2
 			}
 
 			if len(list.Items) > 0{
-				fmt.Printf("\n\n%v: \n",resource.Name)
+				fmt.Printf("%v: \n",resource.Name)
 			}
 
 			for _, item := range list.Items{
+
+				if len(args) == 2{
+					if args[1] != item.Metadata.Name{
+						continue
+					}
+				}
+
+
 				b2,_ := json.MarshalIndent(item, "", "\t")
 
 				//check each against app-def.json
