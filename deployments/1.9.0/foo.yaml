@@ -5,10 +5,10 @@ metadata:
   labels:
     app.kubernetes.io/name: foo
     app.kubernetes.io/version: 0.0.1
-    app.kubernetes.io/component: front-end
     app.kubernetes.io/component-name: nginx
     app.kubernetes.io/component-version: 1.7.9
-    app.kubernetes.io/manager: yaml
+    app.kubernetes.io/tier: front-end
+    app.kubernetes.io/deploy-manager: kubectl
   annotations:
     app.kubernetes.io/usage: http://foo-deployment/
     app.kubernetes.io/url: https://www.nginx.com/
@@ -22,10 +22,10 @@ spec:
       labels:
         app.kubernetes.io/name: foo
         app.kubernetes.io/version: 0.0.1
-        app.kubernetes.io/component: front-end
         app.kubernetes.io/component-name: nginx
         app.kubernetes.io/component-version: 1.7.9
-        app.kubernetes.io/manager: yaml
+        app.kubernetes.io/tier: front-end
+        app.kubernetes.io/deploy-manager: kubectl
     spec:
       containers:
       - name: nginx

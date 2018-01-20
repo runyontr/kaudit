@@ -61,31 +61,22 @@ applications:
 ```bash
 $ kaudit --spec app-def.json
 
-
 deployments: 
 bar-deployment:	Errors:
 	 - app.kubernetes.io/name: app.kubernetes.io/name is required
 	 - app.kubernetes.io/version: app.kubernetes.io/version is required
-	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
-	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
-	 - app.kubernetes.io/component: app.kubernetes.io/component is required
-	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
-	 - app.kubernetes.io/usage: app.kubernetes.io/usage is required
-	 - app.kubernetes.io/url: app.kubernetes.io/url is required
+	 - app.kubernetes.io/deploy-manager: app.kubernetes.io/deploy-manager is required
 foo-deployment:	Ok!
-
-
 replicasets: 
 bar-deployment-589f55cb9d:	Errors:
 	 - app.kubernetes.io/name: app.kubernetes.io/name is required
 	 - app.kubernetes.io/version: app.kubernetes.io/version is required
-	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
-	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
-	 - app.kubernetes.io/component: app.kubernetes.io/component is required
-	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
-	 - app.kubernetes.io/usage: app.kubernetes.io/usage is required
-	 - app.kubernetes.io/url: app.kubernetes.io/url is required
-foo-deployment-57fc95945b:	Ok!
+	 - app.kubernetes.io/deploy-manager: app.kubernetes.io/deploy-manager is required
+foo-deployment-57fc95945b:	Errors:
+	 - app.kubernetes.io/deploy-manager: app.kubernetes.io/deploy-manager is required
+foo-deployment-744646dc5d:	Ok!
+exit status 7
+
 
 ```
 
@@ -96,38 +87,24 @@ $ kaudit --spec app-def.json --version v1
 
 
 pods: 
-bar-deployment-589f55cb9d-2zbdz:	Errors:
+bar-deployment-589f55cb9d-qftz2:	Errors:
 	 - app.kubernetes.io/name: app.kubernetes.io/name is required
 	 - app.kubernetes.io/version: app.kubernetes.io/version is required
-	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
-	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
-	 - app.kubernetes.io/component: app.kubernetes.io/component is required
-	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
-bar-deployment-589f55cb9d-6msgt:	Errors:
+	 - app.kubernetes.io/deploy-manager: app.kubernetes.io/deploy-manager is required
+bar-deployment-589f55cb9d-t5sm5:	Errors:
 	 - app.kubernetes.io/name: app.kubernetes.io/name is required
 	 - app.kubernetes.io/version: app.kubernetes.io/version is required
-	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
-	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
-	 - app.kubernetes.io/component: app.kubernetes.io/component is required
-	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
-bar-deployment-589f55cb9d-8jw56:	Errors:
+	 - app.kubernetes.io/deploy-manager: app.kubernetes.io/deploy-manager is required
+bar-deployment-589f55cb9d-xdcms:	Errors:
 	 - app.kubernetes.io/name: app.kubernetes.io/name is required
 	 - app.kubernetes.io/version: app.kubernetes.io/version is required
-	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
-	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
-	 - app.kubernetes.io/component: app.kubernetes.io/component is required
-	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
-foo-deployment-57fc95945b-hf2p6:	Ok!
-
-
+	 - app.kubernetes.io/deploy-manager: app.kubernetes.io/deploy-manager is required
+foo-deployment-744646dc5d-z25n5:	Ok!
 services: 
 kubernetes:	Errors:
 	 - app.kubernetes.io/name: app.kubernetes.io/name is required
 	 - app.kubernetes.io/version: app.kubernetes.io/version is required
-	 - app.kubernetes.io/component-name: app.kubernetes.io/component-name is required
-	 - app.kubernetes.io/component-version: app.kubernetes.io/component-version is required
-	 - app.kubernetes.io/component: app.kubernetes.io/component is required
-	 - app.kubernetes.io/manager: app.kubernetes.io/manager is required
-exit status 24
+	 - app.kubernetes.io/deploy-manager: app.kubernetes.io/deploy-manager is required
+exit status 12
 
 ```
