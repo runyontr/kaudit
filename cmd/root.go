@@ -209,7 +209,7 @@ func init() {
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	RootCmd.Flags().StringP("namespace", "n", "default", "Limit search to provided namespace")
 	RootCmd.Flags().StringP("spec", "s","app-def.json","JSON Spec to use")
-	RootCmd.Flags().StringP("version", "v","apps/v1beta2","Resource group to query")
+	RootCmd.Flags().StringP("version", "v","apps/v1","Resource group to query")
 
 	if home := homeDir(); home != "" {
 		kubeconfig = RootCmd.Flags().String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")

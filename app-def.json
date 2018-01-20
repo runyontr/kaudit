@@ -15,9 +15,10 @@
               "$id": "/properties/metadata/properties/labels/properties/app.kubernetes.io/name",
               "type": "string",
               "title": "The App.kubernetes.io/name Schema",
-              "description": "The name of the application stack (e.g., Mediawiki, wordpress)",
+              "description": "The name of the application stack",
               "examples": [
-                "wordpress"
+                "wordpress",
+                "Mediawiki"
               ]
             },
             "app.kubernetes.io/version": {
@@ -50,32 +51,41 @@
               ]
             },
             "app.kubernetes.io/component": {
-              "$id": "/properties/metadata/properties/labels/properties/app.kubernetes.io/component",
+              "$id": "/properties/metadata/properties/labels/properties/app.kubernetes.io/tier",
               "type": "string",
-              "title": "The App.kubernetes.io/component Schema",
+              "title": "The App.kubernetes.io/tier Schema",
               "description": "The component of the larger application (e.g., front-end). This is optional as not every application will have different components",
               "examples": [
                 "front-end"
               ]
             },
-            "app.kubernetes.io/manager": {
-              "$id": "/properties/metadata/properties/labels/properties/app.kubernetes.io/manager",
+            "app.kubernetes.io/deploy-manager": {
+              "$id": "/properties/metadata/properties/labels/properties/app.kubernetes.io/deploy-manager",
               "type": "string",
-              "title": "The App.kubernetes.io/manager Schema",
+              "title": "The App.kubernetes.io/deploy-manager Schema",
               "description": "The tool being used to manage the operation of an application (e.g., helm).",
               "default": "",
               "examples": [
-                "helm"
+                "helm",
+                "kubectl"
+              ]
+            },
+            "label app.kubernetes.io/app-instance": {
+              "$id": "/properties/metadata/properties/labels/properties/app.kubernetes.io/app-instance",
+              "type": "string",
+              "title": "The App.kubernetes.io/app-instance Schema",
+              "description": "A string/id of a running instance. In addition to name, it allows to distinct between two instances of a same application. Similar to the ‘release’ label in Helm ",
+              "default": "",
+              "examples": [
+                "pre-prod",
+                "crabs-1"
               ]
             }
           },
           "required": [
                        "app.kubernetes.io/name",
                        "app.kubernetes.io/version",
-                       "app.kubernetes.io/component-name",
-                       "app.kubernetes.io/component-version",
-                       "app.kubernetes.io/component",
-                       "app.kubernetes.io/manager"
+                       "app.kubernetes.io/deploy-manager"
                    ]
         },
         "annotations": {
@@ -102,8 +112,6 @@
             }
           },
           "required": [
-            "app.kubernetes.io/usage",
-            "app.kubernetes.io/url"
           ]
         }
       }
